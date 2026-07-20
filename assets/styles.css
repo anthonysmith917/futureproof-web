@@ -291,6 +291,8 @@ h3 { font-size: 1.28rem; }
 .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(46, 116, 181, .12); }
 .form-note { margin: .9rem 0 0; color: var(--muted); font-size: .82rem; }
 .form-status { min-height: 1.3rem; margin-top: .7rem; color: var(--green); font-size: .9rem; font-weight: 700; }
+.form-status.error { color: #b42318; }
+.button:disabled { cursor: wait; opacity: .7; }
 
 .faq { display: grid; gap: .75rem; }
 .faq details { border: 1px solid var(--line); border-radius: 12px; background: var(--white); }
@@ -356,4 +358,3 @@ h3 { font-size: 1.28rem; }
   .footer-bottom { flex-direction: column; gap: .5rem; }
   .field-full { grid-column: auto; }
 }
-
