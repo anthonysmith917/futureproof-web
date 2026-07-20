@@ -37,22 +37,42 @@ if ('IntersectionObserver' in window) {
 
 const contactForm = document.querySelector('[data-contact-form]');
 if (contactForm) {
-  contactForm.addEventListener('submit', (event) => {
+  contactForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const form = new FormData(contactForm);
-    const name = form.get('name') || '';
-    const organization = form.get('organization') || '';
-    const email = form.get('email') || '';
-    const phone = form.get('phone') || '';
-    const interest = form.get('interest') || 'General inquiry';
-    const message = form.get('message') || '';
-    const subject = encodeURIComponent(`FutureProof inquiry: ${interest}`);
-    const body = encodeURIComponent(
-      `Name: ${name}\nOrganization: ${organization}\nEmail: ${email}\nPhone: ${phone}\nInterest: ${interest}\n\nHow can FutureProof help?\n${message}`
-    );
     const status = contactForm.querySelector('.form-status');
-    if (status) status.textContent = 'Opening your email app with the request details…';
-    window.location.href = `mailto:askfutureproof@outlook.com?subject=${subject}&body=${body}`;
+    const submitButton = contactForm.querySelector('button[type="submit"]');
+    const originalLabel = submitButton ? submitButton.textContent : '';
+
+    if (status) {
+      status.classList.remove('error');
+      status.textContent = 'Sending your request…';
+    }
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Sending…';
+    }
+
+    try {
+      const response = await fetch(contactForm.action, {
+        method: 'POST',
+        body: new FormData(contactForm),
+        headers: { Accept: 'application/json' }
+      });
+
+      if (!response.ok) throw new Error('Form submission failed');
+
+      contactForm.reset();
+      if (status) status.textContent = 'Thank you. Your request has been sent to FutureProof.';
+    } catch (error) {
+      if (status) {
+        status.classList.add('error');
+        status.textContent = 'We could not send your request. Please try again or email askfutureproof@outlook.com.';
+      }
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = originalLabel;
+      }
+    }
   });
 }
-
