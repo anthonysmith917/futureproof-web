@@ -122,11 +122,6 @@ table.inv-items td.qty,table.inv-items td.rate{text-align:right;white-space:nowr
 .inv-notes{font-size:.85rem;color:#475569;border-top:1px solid var(--line);padding-top:14px;margin-bottom:8px}
 .inv-notes h4{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px}
 .inv-foot{margin-top:26px;font-size:.75rem;color:var(--muted);text-align:center;border-top:1px solid var(--line);padding-top:12px}
-.watermark{
-  position:absolute;top:44%;left:50%;transform:translate(-50%,-50%) rotate(-28deg);
-  font-size:5.2rem;font-weight:900;letter-spacing:8px;color:rgba(100,116,139,.13);
-  text-transform:uppercase;pointer-events:none;white-space:nowrap;z-index:0;
-}
 #invoiceSheet>*{position:relative;z-index:1}
 /* ============ MODAL (lead gate) ============ */
 .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.6);display:none;align-items:center;justify-content:center;z-index:50;padding:18px}
@@ -304,7 +299,6 @@ table.inv-items td.qty,table.inv-items td.rate{text-align:right;white-space:nowr
       <button type="button" class="btn btn-primary btn-sm" id="btnPrintTop" style="width:auto">Download PDF / Print</button>
     </div>
     <div id="invoiceSheet" aria-label="Invoice preview">
-      <div class="watermark" id="watermark">Draft</div>
       <div class="inv-top">
         <div class="inv-brand">
           <img id="inv-bizLogo" alt="" style="display:none">
@@ -578,7 +572,6 @@ function renderPreview(){
   const isQuote = state.type === "quote";
   $("inv-type").textContent = isQuote ? "Quote" : "Invoice";
   $("inv-number").textContent = "# " + (state.number || "\u2014");
-  $("watermark").textContent = state.status;
   $("inv-bizName").textContent = state.bizName || "Your Business";
   $("inv-bizEmail").textContent = state.bizEmail || "";
   const logo = $("inv-bizLogo");
