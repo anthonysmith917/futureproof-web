@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Invoice &amp; Quote Generator | FutureProof</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="description" content="Create professional invoices and quotes in seconds. Free, no signup required.">
+<style>
+/* ============ BRAND VARIABLES (set from BRAND config in JS) ============ */
+:root{
+  --primary:#1a56db;
+  --accent:#0e3a8f;
+  --ink:#1c2430;
+  --muted:#64748b;
+  --line:#e5eaf1;
+  --bg:#f4f6fa;
+  --card:#ffffff;
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+/* ============ HEADER (mirrors askfutureproof.com) ============ */
+.site-header{position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(220,229,238,.8);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.nav-wrap{max-width:1180px;margin:0 auto;min-height:82px;display:flex;align-items:center;
+  justify-content:space-between;gap:1rem;padding:0 20px}
+.brand img{height:44px;width:auto;display:block}
+.site-nav{display:flex;align-items:center;gap:.25rem}
+.site-nav a{padding:.65rem .78rem;border-radius:9px;color:#445262;font-size:.94rem;font-weight:700;text-decoration:none}
+.site-nav a:hover{color:#2e74b5;background:#f5faff}
+.site-nav .nav-cta{margin-left:.5rem;padding:.72rem 1rem;color:#fff;background:#102b4e;border-radius:9px}
+.site-nav .nav-cta:hover{color:#fff;background:#2e74b5}
+.page-title{max-width:1180px;margin:0 auto;padding:34px 20px 6px}
+.page-title h1{font-size:1.6rem;color:#102b4e;letter-spacing:-.02em;margin:0 0 4px}
+.page-title h1 span{color:#2e74b5}
+.page-title p{color:#5e6b7a;font-size:.95rem;margin:0}
+@media(max-width:760px){.site-nav a:not(.nav-cta){display:none}.brand img{height:38px}}
+/* ============ LAYOUT ============ */
+.app{max-width:1200px;margin:0 auto;padding:16px;display:grid;gap:20px;grid-template-columns:1fr}
+@media(min-width:980px){
+  .app{grid-template-columns:430px 1fr;align-items:start}
+}
+/* ============ CARDS / FORM ============ */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 1px 3px rgba(15,30,60,.06)}
+.card h2{font-size:1rem;margin-bottom:12px;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;font-size:.78rem}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:.8rem;font-weight:600;margin-bottom:5px;color:#334155}
+.field input[type=text],.field input[type=email],.field input[type=date],
+.field input[type=number],.field select,.field textarea{
+  width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;
+  background:#fff;color:var(--ink);
+}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--primary);border-color:var(--primary)}
+.field textarea{resize:vertical;min-height:70px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+/* type toggle */
+.type-toggle{display:flex;background:#eef2f7;border-radius:10px;padding:4px;gap:4px;margin-bottom:14px}
+.type-toggle button{flex:1;border:0;background:transparent;padding:10px;border-radius:8px;font-weight:700;font-size:.95rem;color:var(--muted);cursor:pointer}
+.type-toggle button.active{background:var(--primary);color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+/* items */
+.item-row{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px;background:#fbfcfe}
+.item-row .desc{width:100%;margin-bottom:8px}
+.item-meta{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end}
+.item-meta input{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:.9rem}
+.item-meta small{display:block;font-size:.68rem;color:var(--muted);font-weight:600;margin-bottom:3px}
+.line-total{font-weight:700;font-size:.95rem;padding-bottom:8px;white-space:nowrap}
+.btn-remove{background:none;border:0;color:#dc2626;font-size:1.15rem;cursor:pointer;padding:4px 6px;line-height:1}
+/* buttons */
+.btn{display:inline-block;border:0;border-radius:10px;padding:12px 18px;font-size:.95rem;font-weight:700;cursor:pointer;text-align:center}
+.btn-primary{background:var(--primary);color:#fff;width:100%}
+.btn-primary:hover{filter:brightness(.94)}
+.btn-ghost{background:#eef2f7;color:var(--accent)}
+.btn-danger-ghost{background:#fef2f2;color:#dc2626}
+.btn-sm{padding:8px 12px;font-size:.82rem;border-radius:8px}
+.btn-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn-row .btn{flex:1}
+.empty-note{font-size:.82rem;color:var(--muted);font-style:italic}
+/* logo upload preview */
+.logo-pick{display:flex;align-items:center;gap:10px}
+.logo-pick img{height:44px;width:auto;border:1px solid var(--line);border-radius:8px;display:none;background:#fff}
+/* ============ INVOICE PREVIEW SHEET ============ */
+.preview-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.preview-head h2{font-size:.95rem;color:var(--accent)}
+#invoiceSheet{
+  background:#fff;border:1px solid var(--line);border-radius:6px;
+  padding:34px 30px;position:relative;overflow:hidden;
+  box-shadow:0 4px 18px rgba(15,30,60,.10);max-width:800px;margin:0 auto;
+  color:#1c2430;
+}
+.inv-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:26px;flex-wrap:wrap}
+.inv-brand img{max-height:56px;max-width:180px;margin-bottom:8px}
+.inv-brand h3{font-size:1.3rem;color:var(--accent)}
+.inv-brand .biz-email{font-size:.82rem;color:var(--muted)}
+.inv-doc{text-align:right}
+.inv-doc .doc-type{font-size:1.7rem;font-weight:800;color:var(--primary);letter-spacing:1px;text-transform:uppercase}
+.inv-doc .doc-num{font-size:.9rem;color:var(--muted);margin-top:2px}
+.inv-parties{display:flex;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.inv-parties .party{flex:1;min-width:200px}
+.inv-parties .party h4{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px}
+.inv-parties .party .p-name{font-weight:700;font-size:1rem}
+.inv-parties .party div{font-size:.88rem}
+.inv-dates{display:flex;gap:26px;margin-bottom:22px;flex-wrap:wrap;font-size:.88rem}
+.inv-dates span{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+table.inv-items{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:.9rem}
+table.inv-items th{background:var(--primary);color:#fff;text-align:left;padding:10px 12px;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px}
+table.inv-items th:first-child{border-radius:6px 0 0 0}
+table.inv-items th:last-child{border-radius:0 6px 0 0;text-align:right}
+table.inv-items td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+table.inv-items td.num{text-align:right;white-space:nowrap}
+table.inv-items td.qty,table.inv-items td.rate{text-align:right;white-space:nowrap}
+.inv-totals{display:flex;justify-content:flex-end;margin-bottom:22px}
+.inv-totals table{border-collapse:collapse;font-size:.92rem;min-width:250px}
+.inv-totals td{padding:6px 4px 6px 18px}
+.inv-totals td:last-child{text-align:right;font-weight:600;white-space:nowrap}
+.inv-totals tr.grand td{font-size:1.15rem;font-weight:800;color:var(--primary);border-top:2px solid var(--primary);padding-top:10px}
+.inv-notes{font-size:.85rem;color:#475569;border-top:1px solid var(--line);padding-top:14px;margin-bottom:8px}
+.inv-notes h4{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px}
+.inv-foot{margin-top:26px;font-size:.75rem;color:var(--muted);text-align:center;border-top:1px solid var(--line);padding-top:12px}
+.watermark{
+  position:absolute;top:44%;left:50%;transform:translate(-50%,-50%) rotate(-28deg);
+  font-size:5.2rem;font-weight:900;letter-spacing:8px;color:rgba(100,116,139,.13);
+  text-transform:uppercase;pointer-events:none;white-space:nowrap;z-index:0;
+}
+#invoiceSheet>*{position:relative;z-index:1}
+/* ============ MODAL (lead gate) ============ */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.6);display:none;align-items:center;justify-content:center;z-index:50;padding:18px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;padding:28px 24px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal h3{font-size:1.25rem;margin-bottom:8px;color:var(--accent)}
+.modal p{font-size:.9rem;color:var(--muted);margin-bottom:16px}
+.modal input[type=email]{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font-size:1rem;margin-bottom:12px}
+.modal .btn-primary{width:100%}
+.modal .skip{display:inline-block;margin-top:12px;font-size:.82rem;color:var(--muted);text-decoration:underline;cursor:pointer;background:none;border:0}
+.modal .err{color:#dc2626;font-size:.8rem;margin-bottom:8px;display:none}
+/* ============ FOOTER (mirrors askfutureproof.com) ============ */
+.site-footer{padding:4rem 0 1.5rem;color:#c3d2df;background:#0a2039;margin-top:44px}
+.site-footer .container{width:min(calc(100% - 2rem),1180px);margin-inline:auto}
+.footer-grid{display:grid;grid-template-columns:1.5fr repeat(3,1fr);gap:3rem}
+.footer-brand img{width:220px;max-width:100%;filter:brightness(0) invert(1);opacity:.92}
+.footer-brand p{max-width:340px;color:#9eb1c3;font-size:.92rem;margin-top:14px}
+.footer-col h3{margin:0 0 .9rem;color:#fff;font-size:.92rem;text-transform:uppercase;letter-spacing:.08em}
+.footer-col a{display:block;width:fit-content;margin:.42rem 0;color:#b8c9d8;text-decoration:none;font-size:.92rem}
+.footer-col a:hover{color:#fff}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-top:3rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,.12);color:#8ea3b7;font-size:.82rem}
+.footer-bottom a{color:#8ea3b7;text-decoration:underline;cursor:pointer}
+@media(max-width:820px){.footer-grid{grid-template-columns:1fr 1fr;gap:2rem}}
+@media(max-width:520px){.footer-grid{grid-template-columns:1fr}}
+#adminPanel{display:none;max-width:560px;margin:14px auto 0;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;text-align:left}
+#adminPanel.open{display:block}
+#adminPanel h4{font-size:.85rem;margin-bottom:8px}
+/* ============ PRINT ============ */
+@media print{
+  .screen-only{display:none !important}
+  body{background:#fff}
+  .app{display:block;padding:0;max-width:none}
+  #invoiceSheet{box-shadow:none;border:0;border-radius:0;max-width:none;margin:0;padding:10px 4px;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  table.inv-items th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .preview-head{display:none}
+  @page{margin:14mm}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header screen-only">
+  <div class="nav-wrap">
+    <a class="brand" href="index.html" aria-label="FutureProof home"><img id="brandLogo" alt="FutureProof"></a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="index.html">Home</a><a href="products.html">Products</a><a href="services.html">Services</a><a href="about.html">About</a><a href="insights.html">Insights</a><a href="invoice-generator.html" aria-current="page">Invoice Generator</a><a class="nav-cta" href="contact.html">Contact us</a>
+    </nav>
+  </div>
+</header>
+<div class="page-title screen-only">
+  <h1>Free <span>Invoice &amp; Quote</span> Generator</h1>
+  <p id="brandTagline"></p>
+</div>
+
+<div class="app">
+  <!-- ============ BUILDER FORM ============ -->
+  <section class="builder screen-only">
+    <div class="card">
+      <div class="type-toggle" role="tablist" aria-label="Document type">
+        <button type="button" id="typeInvoice" class="active">Invoice</button>
+        <button type="button" id="typeQuote">Quote</button>
+      </div>
+
+      <h2>Your Business</h2>
+      <div class="field">
+        <label for="f-bizName">Business name</label>
+        <input type="text" id="f-bizName" placeholder="Acme Studio LLC" autocomplete="organization">
+      </div>
+      <div class="field">
+        <label for="f-bizEmail">Business email</label>
+        <input type="email" id="f-bizEmail" placeholder="you@yourbusiness.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Logo <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <div class="logo-pick">
+          <img id="logoPreview" alt="logo preview">
+          <input type="file" id="f-logo" accept="image/*" aria-label="Upload logo">
+        </div>
+      </div>
+
+      <h2 style="margin-top:18px">Client</h2>
+      <div class="field">
+        <label for="f-clientName">Client name</label>
+        <input type="text" id="f-clientName" placeholder="Client or company name">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="f-clientEmail">Client email</label>
+          <input type="email" id="f-clientEmail" placeholder="client@email.com">
+        </div>
+        <div class="field">
+          <label for="f-clientAddress">Client address</label>
+          <input type="text" id="f-clientAddress" placeholder="Street, City, State">
+        </div>
+      </div>
+
+      <h2 style="margin-top:18px">Details</h2>
+      <div class="row2">
+        <div class="field">
+          <label for="f-number">Document number</label>
+          <input type="text" id="f-number">
+        </div>
+        <div class="field">
+          <label for="f-status">Status</label>
+          <select id="f-status">
+            <option>Draft</option>
+            <option>Unpaid</option>
+            <option>Paid</option>
+          </select>
+        </div>
+      </div>
+      <div class="row3">
+        <div class="field">
+          <label for="f-issue">Issue date</label>
+          <input type="date" id="f-issue">
+        </div>
+        <div class="field">
+          <label for="f-due">Due date</label>
+          <input type="date" id="f-due">
+        </div>
+        <div class="field">
+          <label for="f-currency">Currency</label>
+          <select id="f-currency">
+            <option value="USD" selected>USD $</option>
+            <option value="EUR">EUR €</option>
+            <option value="GBP">GBP £</option>
+            <option value="CAD">CAD $</option>
+            <option value="AUD">AUD $</option>
+            <option value="JPY">JPY ¥</option>
+            <option value="MXN">MXN $</option>
+            <option value="NGN">NGN ₦</option>
+          </select>
+        </div>
+      </div>
+
+      <h2 style="margin-top:18px">Line Items</h2>
+      <div id="itemsBody"></div>
+      <button type="button" class="btn btn-ghost btn-sm" id="addItem">+ Add line item</button>
+
+      <h2 style="margin-top:18px">Tax &amp; Discount</h2>
+      <div class="row2">
+        <div class="field">
+          <label for="f-tax">Tax %</label>
+          <input type="number" id="f-tax" min="0" step="0.01" value="0">
+        </div>
+        <div class="field">
+          <label for="f-discount">Discount</label>
+          <div style="display:flex;gap:6px">
+            <input type="number" id="f-discount" min="0" step="0.01" value="0" style="flex:1">
+            <select id="f-discountType" style="width:74px" aria-label="Discount type">
+              <option value="percent">%</option>
+              <option value="flat">Flat</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-notes">Notes / payment terms</label>
+        <textarea id="f-notes" placeholder="e.g. Payment due within 14 days. Thank you for your business!"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" class="btn btn-ghost" id="btnNew">New</button>
+      </div>
+      <button type="button" class="btn btn-primary" id="btnPrint" style="margin-top:10px">Download PDF / Print</button>
+    </div>
+  </section>
+
+  <!-- ============ LIVE PREVIEW ============ -->
+  <section class="preview">
+    <div class="preview-head screen-only">
+      <h2>Live Preview</h2>
+      <button type="button" class="btn btn-primary btn-sm" id="btnPrintTop" style="width:auto">Download PDF / Print</button>
+    </div>
+    <div id="invoiceSheet" aria-label="Invoice preview">
+      <div class="watermark" id="watermark">Draft</div>
+      <div class="inv-top">
+        <div class="inv-brand">
+          <img id="inv-bizLogo" alt="" style="display:none">
+          <h3 id="inv-bizName">Your Business</h3>
+          <div class="biz-email" id="inv-bizEmail"></div>
+        </div>
+        <div class="inv-doc">
+          <div class="doc-type" id="inv-type">Invoice</div>
+          <div class="doc-num" id="inv-number"># INV-1001</div>
+        </div>
+      </div>
+      <div class="inv-parties">
+        <div class="party">
+          <h4>Billed To</h4>
+          <div class="p-name" id="inv-clientName">Client Name</div>
+          <div id="inv-clientEmail"></div>
+          <div id="inv-clientAddress"></div>
+        </div>
+        <div class="party" style="text-align:right">
+          <h4>&nbsp;</h4>
+          <div></div>
+        </div>
+      </div>
+      <div class="inv-dates">
+        <div><span>Issue Date</span><strong id="inv-issue">—</strong></div>
+        <div><span>Due Date</span><strong id="inv-due">—</strong></div>
+      </div>
+      <table class="inv-items">
+        <thead>
+          <tr><th>Description</th><th style="text-align:right">Qty</th><th style="text-align:right">Rate</th><th style="text-align:right">Amount</th></tr>
+        </thead>
+        <tbody id="inv-items"></tbody>
+      </table>
+      <div class="inv-totals">
+        <table>
+          <tr><td>Subtotal</td><td id="inv-subtotal">$0.00</td></tr>
+          <tr id="inv-discount-row" style="display:none"><td id="inv-discount-label">Discount</td><td id="inv-discount">−$0.00</td></tr>
+          <tr id="inv-tax-row" style="display:none"><td id="inv-tax-label">Tax</td><td id="inv-tax">$0.00</td></tr>
+          <tr class="grand"><td>Total Due</td><td id="inv-total">$0.00</td></tr>
+        </table>
+      </div>
+      <div class="inv-notes" id="inv-notes-wrap" style="display:none">
+        <h4>Notes / Payment Terms</h4>
+        <div id="inv-notes"></div>
+      </div>
+      <div class="inv-foot" id="inv-foot">Generated with FutureProof — free invoice generator</div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ LEAD GATE MODAL ============ -->
+<div class="modal-overlay screen-only" id="gateModal" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+  <div class="modal">
+   <div id="gateMain">
+    <h3 id="gateTitle">Your invoice is ready 🎉</h3>
+    <p id="gateSub">Enter your email to download your free invoice — plus get <strong>5 free business templates</strong> sent to your inbox.</p>
+    <form id="gateForm">
+      <input type="email" id="gateEmail" placeholder="you@yourbusiness.com" required autocomplete="email">
+      <div class="err" id="gateErr">Please enter a valid email address.</div>
+      <button type="submit" class="btn btn-primary">Send My Invoice + Templates</button>
+    </form>
+    <button type="button" class="skip" id="gateSkip" style="display:none">No thanks, just download my invoice</button>
+   </div>
+   <div id="gateDone" style="display:none">
+    <h3 id="gateDoneTitle">You're in! 🎉</h3>
+    <p id="gateDoneMsg">Your invoice + <strong>5 free business templates</strong> are on the way to <strong id="gateDoneEmail"></strong>.</p>
+    <button type="button" class="btn btn-primary" id="gateDonePrint">Download / Print My Invoice</button>
+   </div>
+  </div>
+</div>
+
+<footer class="site-footer screen-only">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img id="footerLogo" alt="FutureProof">
+        <p>AI software and automation tools that help people and organizations make smarter decisions with their data.</p>
+      </div>
+      <div class="footer-col">
+        <h3>Products</h3>
+        <a href="products.html#siftiq">SiftIQ</a>
+        <a href="products.html#siftiq-money">SiftIQ Money</a>
+        <a href="products.html#calculator-buddy">Calculator Buddy</a>
+      </div>
+      <div class="footer-col">
+        <h3>Company</h3>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="insights.html">Insights</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h3>Connect</h3>
+        <a href="mailto:askfutureproof@outlook.com">askfutureproof@outlook.com</a>
+        <a href="tel:+19013357379">901-335-7379</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; <span data-year></span> FutureProof, a DBA of The Desygn Shop, LLC.</span>
+      <span>AI software. Practical automation. Smarter decisions. &middot; <a id="adminToggle" href="#adminPanel">Admin</a></span>
+    </div>
+    <div id="adminPanel">
+      <h4>Lead Capture Admin</h4>
+      <p style="font-size:.85rem;margin-bottom:6px">Emails captured: <strong id="leadCount">0</strong></p>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:6px;word-break:break-all">Endpoint: <span id="fsEndpointLabel"></span></p>
+      <p id="fsTestResult" style="font-size:.8rem;margin-bottom:8px;min-height:1.2em"></p>
+      <div class="btn-row" style="margin-top:0">
+        <button type="button" class="btn btn-ghost btn-sm" id="btnTestEndpoint">Test endpoint</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="btnRetryLeads">Retry unsent</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="btnExportLeads">Export leads (CSV)</button>
+        <button type="button" class="btn btn-danger-ghost btn-sm" id="btnClearLeads">Clear leads</button>
+      </div>
+      <div id="leadStatusList" style="font-size:.78rem;margin-top:10px;max-height:170px;overflow:auto"></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+"use strict";
+/* ============================================================================
+   ★★★  BRAND CONFIG — RE-SKIN THE ENTIRE APP BY EDITING ONLY THIS OBJECT  ★★★
+   ----------------------------------------------------------------------------
+   To re-brand for another site (e.g. The Desygn Shop):
+     1. Change brandName        -> "The Desygn Shop"
+     2. Change tagline          -> whatever headline you want under the name
+     3. Change logo             -> "logo.png" (drop your logo file in this folder)
+     4. Change primaryColor     -> your brand color, e.g. "#e11d48"
+     5. Change accentColor      -> a darker shade of it, e.g. "#9f1239"
+     6. Change contactEmail     -> your contact email
+     7. Change freebieTitle     -> the bonus you promise in the email gate
+   That's it. Colors, header, invoice styling, footer and modal all update.
+   ============================================================================ */
+const BRAND = {
+  brandName:    "FutureProof",
+  tagline:      "AI software built for real life and real work — start with a free invoice generator",
+  logo:         "assets/futureproof-logo.png",
+  primaryColor: "#2e74b5", // official site blue
+  accentColor:  "#102b4e", // official site navy
+  contactEmail: "askfutureproof@outlook.com",
+  freebieTitle: "5 free business templates",
+  // Paste your Formspree endpoint here, e.g. "https://formspree.io/f/abcdwxyz".
+  // Leave "" to store leads in the browser only (CSV export still works).
+  formspreeEndpoint: "https://formspree.io/f/mdekznow",
+};
+
+/* ---------------- state ---------------- */
+const $ = id => document.getElementById(id);
+const state = {
+  type: "invoice",            // "invoice" | "quote"
+  bizName: "", bizEmail: "", logoData: "",
+  clientName: "", clientEmail: "", clientAddress: "",
+  number: "", status: "Draft",
+  issue: "", due: "", currency: "USD",
+  items: [{ desc: "", qty: 1, rate: 0 }],
+  tax: 0, discount: 0, discountType: "percent",
+  notes: ""
+};
+
+/* ---------------- helpers ---------------- */
+function esc(s){
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function money(n){
+  try { return new Intl.NumberFormat("en-US",{style:"currency",currency:state.currency}).format(n||0); }
+  catch(e){ return "$"+Number(n||0).toFixed(2); }
+}
+function prettyDate(v){
+  if(!v) return "\u2014";
+  const d = new Date(v + "T12:00:00");
+  return isNaN(d) ? v : d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+}
+function calc(){
+  const sub = state.items.reduce((s,i)=> s + (Number(i.qty)||0)*(Number(i.rate)||0), 0);
+  let disc = Number(state.discount)||0;
+  if(state.discountType === "percent") disc = sub * disc/100;
+  disc = Math.min(disc, sub);
+  const taxable = sub - disc;
+  const tax = taxable * ((Number(state.tax)||0)/100);
+  return { sub, disc, tax, total: taxable + tax };
+}
+function lsGet(k, fb){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; }catch(e){ return fb; } }
+function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+
+/* ---------------- branding ---------------- */
+function applyBrand(){
+  const r = document.documentElement.style;
+  r.setProperty("--primary", BRAND.primaryColor);
+  r.setProperty("--accent",  BRAND.accentColor);
+  document.title = BRAND.brandName + " \u2014 Free Invoice & Quote Generator";
+  $("brandTagline").textContent = BRAND.tagline;
+  if(BRAND.logo){
+    const img = $("brandLogo"); img.src = BRAND.logo; img.style.display = "block";
+    const fl = $("footerLogo"); if(fl) fl.src = BRAND.logo;
+  }
+  document.querySelectorAll("[data-year]").forEach(function(el){ el.textContent = new Date().getFullYear(); });
+  $("gateSub").innerHTML = "Enter your email to download your free " +
+    (state.type === "quote" ? "quote" : "invoice") +
+    " \u2014 plus get <strong>" + esc(BRAND.freebieTitle) + "</strong> sent to your inbox.";
+  $("inv-foot").textContent = "Generated with " + BRAND.brandName + " \u2014 free invoice generator";
+  if(BRAND.contactEmail) $("inv-foot").textContent += " \u00b7 " + BRAND.contactEmail;
+}
+
+/* ---------------- form <-> state ---------------- */
+function readForm(){
+  state.bizName       = $("f-bizName").value.trim();
+  state.bizEmail      = $("f-bizEmail").value.trim();
+  state.clientName    = $("f-clientName").value.trim();
+  state.clientEmail   = $("f-clientEmail").value.trim();
+  state.clientAddress = $("f-clientAddress").value.trim();
+  state.number        = $("f-number").value.trim();
+  state.status        = $("f-status").value;
+  state.issue         = $("f-issue").value;
+  state.due           = $("f-due").value;
+  state.currency      = $("f-currency").value;
+  state.tax           = $("f-tax").value;
+  state.discount      = $("f-discount").value;
+  state.discountType  = $("f-discountType").value;
+  state.notes         = $("f-notes").value.trim();
+}
+function syncForm(){
+  $("f-bizName").value = state.bizName;
+  $("f-bizEmail").value = state.bizEmail;
+  $("f-clientName").value = state.clientName;
+  $("f-clientEmail").value = state.clientEmail;
+  $("f-clientAddress").value = state.clientAddress;
+  $("f-number").value = state.number;
+  $("f-status").value = state.status;
+  $("f-issue").value = state.issue;
+  $("f-due").value = state.due;
+  $("f-currency").value = state.currency;
+  $("f-tax").value = state.tax;
+  $("f-discount").value = state.discount;
+  $("f-discountType").value = state.discountType;
+  $("f-notes").value = state.notes;
+  $("typeInvoice").classList.toggle("active", state.type === "invoice");
+  $("typeQuote").classList.toggle("active", state.type === "quote");
+  if(state.logoData){ $("logoPreview").src = state.logoData; $("logoPreview").style.display = "block"; }
+  else { $("logoPreview").style.display = "none"; }
+}
+
+/* ---------------- line items ---------------- */
+function renderItems(){
+  const body = $("itemsBody");
+  body.innerHTML = "";
+  state.items.forEach((it, i) => {
+    const row = document.createElement("div");
+    row.className = "item-row";
+    row.innerHTML =
+      '<input type="text" class="desc" data-i="'+i+'" data-f="desc" placeholder="Description of work / product" value="'+esc(it.desc)+'">' +
+      '<div class="item-meta">' +
+        '<div><small>Qty</small><input type="number" data-i="'+i+'" data-f="qty" min="0" step="any" value="'+esc(it.qty)+'"></div>' +
+        '<div><small>Rate</small><input type="number" data-i="'+i+'" data-f="rate" min="0" step="any" value="'+esc(it.rate)+'"></div>' +
+        '<div><small>Amount</small><div class="line-total" id="lt-'+i+'">'+esc(money((Number(it.qty)||0)*(Number(it.rate)||0)))+'</div></div>' +
+        '<button type="button" class="btn-remove" data-del="'+i+'" aria-label="Remove line item">\u00d7</button>' +
+      '</div>';
+    body.appendChild(row);
+  });
+}
+function refreshLineTotals(){
+  state.items.forEach((it,i)=>{
+    const el = $("lt-"+i);
+    if(el) el.textContent = money((Number(it.qty)||0)*(Number(it.rate)||0));
+  });
+}
+
+/* ---------------- preview ---------------- */
+function renderPreview(){
+  const c = calc();
+  const isQuote = state.type === "quote";
+  $("inv-type").textContent = isQuote ? "Quote" : "Invoice";
+  $("inv-number").textContent = "# " + (state.number || "\u2014");
+  $("watermark").textContent = state.status;
+  $("inv-bizName").textContent = state.bizName || "Your Business";
+  $("inv-bizEmail").textContent = state.bizEmail || "";
+  const logo = $("inv-bizLogo");
+  if(state.logoData){ logo.src = state.logoData; logo.style.display = "block"; }
+  else logo.style.display = "none";
+  $("inv-clientName").textContent = state.clientName || "Client Name";
+  $("inv-clientEmail").textContent = state.clientEmail || "";
+  $("inv-clientAddress").textContent = state.clientAddress || "";
+  $("inv-issue").textContent = prettyDate(state.issue);
+  $("inv-due").textContent = prettyDate(state.due);
+
+  const tb = $("inv-items");
+  if(state.items.length === 0){
+    tb.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:22px">No line items yet \u2014 add one on the left.</td></tr>';
+  } else {
+    tb.innerHTML = state.items.map(it=>{
+      const amt = (Number(it.qty)||0)*(Number(it.rate)||0);
+      return "<tr><td>"+esc(it.desc || "\u2014")+"</td>" +
+        '<td class="qty">'+esc(it.qty)+'</td>' +
+        '<td class="rate">'+esc(money(it.rate))+'</td>' +
+        '<td class="num">'+esc(money(amt))+"</td></tr>";
+    }).join("");
+  }
+
+  $("inv-subtotal").textContent = money(c.sub);
+  if(c.disc > 0){
+    $("inv-discount-row").style.display = "";
+    $("inv-discount-label").textContent = state.discountType === "percent"
+      ? "Discount ("+esc(state.discount)+"%)" : "Discount";
+    $("inv-discount").textContent = "\u2212" + money(c.disc);
+  } else $("inv-discount-row").style.display = "none";
+  if(c.tax > 0){
+    $("inv-tax-row").style.display = "";
+    $("inv-tax-label").textContent = "Tax ("+esc(state.tax)+"%)";
+    $("inv-tax").textContent = money(c.tax);
+  } else $("inv-tax-row").style.display = "none";
+  $("inv-total").textContent = money(c.total);
+
+  if(state.notes){ $("inv-notes-wrap").style.display = ""; $("inv-notes").textContent = state.notes; }
+  else $("inv-notes-wrap").style.display = "none";
+
+  $("gateSub").innerHTML = "Enter your email to download your free " +
+    (isQuote ? "quote" : "invoice") +
+    " \u2014 plus get <strong>" + esc(BRAND.freebieTitle) + "</strong> sent to your inbox.";
+}
+
+/* ---------------- invoice numbering ---------------- */
+function nextNumber(){
+  const prefix = state.type === "quote" ? "QT-" : "INV-";
+  let n = lsGet("invoice_counter", 1000) + 1;
+  lsSet("invoice_counter", n);
+  return prefix + n;
+}
+
+/* ---------------- lead capture (the point of the app) ---------------- */
+function getLeads(){ return lsGet("invoice_leads", []); }
+
+/* Fallback: plain HTML form POST into a hidden iframe — the same technique as
+   Formspree's own docs snippet. Used only when fetch() itself is blocked (ad
+   blocker, preview sandbox). The POST goes out, but the cross-origin response
+   can't be read, so the result is reported as unverified. */
+function postLeadFallback(payload){
+  return new Promise(function(resolve){
+    try{
+      const stamp = "fsfb" + Date.now();
+      const iframe = document.createElement("iframe");
+      iframe.name = stamp;
+      iframe.style.display = "none";
+      iframe.setAttribute("aria-hidden", "true");
+      const form = document.createElement("form");
+      form.action = BRAND.formspreeEndpoint;
+      form.method = "POST";
+      form.target = stamp;
+      form.style.display = "none";
+      Object.keys(payload).forEach(function(k){
+        const inp = document.createElement("input");
+        inp.type = "hidden"; inp.name = k; inp.value = String(payload[k]);
+        form.appendChild(inp);
+      });
+      let done = false;
+      const timer = setTimeout(function(){ finish(false, "fallback timed out"); }, 20000);
+      const finish = function(ok, msg){
+        if(done) return; done = true;
+        clearTimeout(timer);
+        setTimeout(function(){ iframe.remove(); form.remove(); }, 2000);
+        resolve({ ok: ok, message: msg });
+      };
+      iframe.addEventListener("load", function(){ finish(true, "form posted"); });
+      document.body.appendChild(iframe);
+      document.body.appendChild(form);
+      form.submit();
+    }catch(err){
+      resolve({ ok:false, message: String((err && err.message) || err) });
+    }
+  });
+}
+
+/* POST one lead to Formspree. Returns {ok, status, message}. Never throws,
+   so a blocked request or a Formspree error is reported, never silent. */
+async function postLead(payload){
+  if(!BRAND.formspreeEndpoint) return { ok:false, status:0, message:"No endpoint configured" };
+  try{
+    const res = await fetch(BRAND.formspreeEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    let data = null, msg = "";
+    try{ data = await res.json(); }catch(e){}
+    if(data && typeof data === "object"){
+      msg = data.error || data.message || (data.ok ? "ok" : JSON.stringify(data));
+    } else {
+      msg = res.statusText || ("HTTP " + res.status);
+    }
+    const ok = res.ok && !(data && data.error);
+    return { ok: ok, status: res.status, message: msg };
+  }catch(err){
+    /* fetch() itself was blocked — try the plain-form fallback before giving up */
+    const fb = await postLeadFallback(payload);
+    if(fb.ok) return { ok:true, status:0, message:"Sent via plain-form fallback (delivery unverified)" };
+    return { ok:false, status:0, message: String((err && err.message) || err) + " / fallback: " + fb.message };
+  }
+}
+
+function leadPayload(lead){
+  return {
+    email: lead.email,
+    business: lead.business || "",
+    source: "invoice-generator",
+    _subject: "New lead: invoice generator"
+  };
+}
+
+function saveLead(email){
+  const leads = getLeads();
+  const lead = {
+    email: email,
+    business: state.bizName || "",
+    captured_at: new Date().toISOString(),
+    sent: false,
+    send_status: "queued"
+  };
+  leads.push(lead);
+  lsSet("invoice_leads", leads);
+  updateLeadCount();
+  flushLeadQueue(); // fire-and-forget; status lands in the Admin panel
+  return lead;
+}
+
+/* Retry every unsent lead, in order. Stops at the first failure so a dead
+   endpoint doesn't hammer Formspree; the rest retry on the next submit. */
+async function flushLeadQueue(){
+  if(!BRAND.formspreeEndpoint || flushLeadQueue.running) return;
+  flushLeadQueue.running = true;
+  try{
+    const leads = getLeads();
+    let changed = false;
+    for(const lead of leads){
+      if(lead.sent) continue;
+      const r = await postLead(leadPayload(lead));
+      lead.send_status = r.status ? ("HTTP " + r.status + " — " + r.message) : r.message;
+      if(r.ok) lead.sent = true;
+      changed = true;
+      if(!r.ok) break;
+    }
+    if(changed){ lsSet("invoice_leads", leads); renderLeadStatus(); }
+  }finally{
+    flushLeadQueue.running = false;
+  }
+}
+function updateLeadCount(){ $("leadCount").textContent = getLeads().length; renderLeadStatus(); }
+function renderLeadStatus(){
+  const box = $("leadStatusList");
+  if(!box) return;
+  const leads = getLeads().slice(-8).reverse();
+  box.innerHTML = "";
+  if(!leads.length){
+    box.innerHTML = '<span style="color:var(--muted)">No leads captured yet.</span>';
+    return;
+  }
+  leads.forEach(l => {
+    const row = document.createElement("div");
+    row.style.cssText = "padding:4px 0;border-bottom:1px solid var(--line)";
+    const dot = document.createElement("span");
+    dot.textContent = l.sent ? "✓ " : "✗ ";
+    dot.style.color = l.sent ? "#16a34a" : "#dc2626";
+    row.appendChild(dot);
+    row.appendChild(document.createTextNode(
+      l.email + " — " + (l.sent ? "sent to Formspree" : ("not sent (" + (l.send_status || "queued") + ")"))
+    ));
+    box.appendChild(row);
+  });
+}
+async function testEndpoint(){
+  const out = $("fsTestResult");
+  out.style.color = "";
+  out.textContent = "Sending test submission…";
+  const r = await postLead({
+    email: "test@example.com",
+    business: "(connection test — safe to delete)",
+    source: "invoice-generator",
+    _subject: "Endpoint test — ignore"
+  });
+  if(r.ok){
+    out.style.color = "#16a34a";
+    out.textContent = "✓ Endpoint OK (HTTP " + r.status + "). Check your Formspree dashboard for the test lead.";
+  } else {
+    out.style.color = "#dc2626";
+    out.textContent = "✗ Failed" + (r.status ? " (HTTP " + r.status + ")" : "") + ": " + r.message +
+      (r.status === 403 ? " — new Formspree forms need email activation before they accept submissions." : "") +
+      (!r.status ? " — the request never left this page (ad blocker, offline, or preview sandbox?)." : "");
+  }
+}
+function exportLeadsCSV(){
+  const leads = getLeads();
+  if(!leads.length){ alert("No leads captured yet."); return; }
+  const rows = [["email","business","captured_at","sent","send_status"]];
+  leads.forEach(l => rows.push([l.email||"", l.business||"", l.captured_at||"", l.sent ? "yes" : "no", l.send_status||""]));
+  const csv = rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n");
+  const blob = new Blob([csv], {type:"text/csv"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "invoice-leads.csv";
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+
+/* ---------------- print / PDF gate flow ---------------- */
+function doPrint(){ window.print(); }
+function requestPrint(){
+  readForm();
+  let captured = false;
+  try{ captured = sessionStorage.getItem("ig_email_captured") === "1"; }catch(e){}
+  if(captured){ doPrint(); return; }
+  $("gateErr").style.display = "none";
+  $("gateEmail").value = "";
+  resetGate();
+  $("gateModal").classList.add("open");
+  setTimeout(()=> $("gateEmail").focus(), 100);
+}
+function closeGate(){ $("gateModal").classList.remove("open"); }
+function showGateSuccess(email){
+  $("gateDoneEmail").textContent = email;
+  $("gateMain").style.display = "none";
+  $("gateDone").style.display = "block";
+}
+function resetGate(){
+  $("gateMain").style.display = "";
+  $("gateDone").style.display = "none";
+}
+
+/* Snapshot the current form state (used by the in-browser work-in-progress autosave). */
+function snapshotState(){
+  readForm();
+  return JSON.parse(JSON.stringify(state));
+}
+function newDocument(){
+  if(!confirm("Start a new document? Unsaved changes will be lost.")) return;
+  state.type = "invoice"; state.bizName = ""; state.bizEmail = ""; state.logoData = "";
+  state.clientName = ""; state.clientEmail = ""; state.clientAddress = "";
+  state.number = nextNumber(); state.status = "Draft";
+  const t = new Date(), d2 = new Date(Date.now() + 14*864e5);
+  state.issue = t.toISOString().slice(0,10); state.due = d2.toISOString().slice(0,10);
+  state.currency = "USD"; state.items = [{desc:"", qty:1, rate:0}];
+  state.tax = 0; state.discount = 0; state.discountType = "percent"; state.notes = "";
+  syncForm(); renderItems(); renderPreview();
+  lsSet("invoice_wip", snapshotState());
+}
+
+/* ---------------- init ---------------- */
+function init(){
+  applyBrand();
+
+  // defaults
+  state.number = nextNumber();
+  const t = new Date(), d2 = new Date(Date.now() + 14*864e5);
+  state.issue = t.toISOString().slice(0,10);
+  state.due = d2.toISOString().slice(0,10);
+
+  // restore work-in-progress if the page was closed mid-edit
+  const wip = lsGet("invoice_wip", null);
+  if(wip && wip.number){ Object.assign(state, wip); }
+
+  syncForm(); renderItems(); renderPreview(); updateLeadCount();
+
+  // type toggle
+  $("typeInvoice").addEventListener("click", ()=> setType("invoice"));
+  $("typeQuote").addEventListener("click", ()=> setType("quote"));
+  function setType(t){
+    readForm();
+    if(state.type !== t){
+      state.type = t;
+      state.number = state.number.replace(/^(INV|QT)-/, t === "quote" ? "QT-" : "INV-");
+      if(!/^(INV|QT)-/.test(state.number)) state.number = nextNumber();
+      $("f-number").value = state.number;
+      syncForm(); renderPreview();
+    }
+  }
+
+  // any form input -> update preview live (+ autosave WIP)
+  const formIds = ["f-bizName","f-bizEmail","f-clientName","f-clientEmail","f-clientAddress",
+    "f-number","f-status","f-issue","f-due","f-currency","f-tax","f-discount","f-discountType","f-notes"];
+  formIds.forEach(id => {
+    $(id).addEventListener("input", ()=>{ readForm(); renderPreview(); lsSet("invoice_wip", snapshotState()); });
+    $(id).addEventListener("change", ()=>{ readForm(); renderPreview(); lsSet("invoice_wip", snapshotState()); });
+  });
+
+  // line items: delegated events (rows re-render, so we can't bind per-row)
+  $("itemsBody").addEventListener("input", e => {
+    const i = e.target.getAttribute("data-i"), f = e.target.getAttribute("data-f");
+    if(i === null || !f) return;
+    state.items[Number(i)][f] = e.target.value;
+    refreshLineTotals(); renderPreview();
+    lsSet("invoice_wip", snapshotState());
+  });
+  $("itemsBody").addEventListener("click", e => {
+    const del = e.target.getAttribute("data-del");
+    if(del === null) return;
+    state.items.splice(Number(del), 1);
+    if(!state.items.length) state.items.push({desc:"", qty:1, rate:0});
+    renderItems(); renderPreview();
+    lsSet("invoice_wip", snapshotState());
+  });
+  $("addItem").addEventListener("click", ()=>{
+    state.items.push({desc:"", qty:1, rate:0});
+    renderItems(); renderPreview();
+  });
+
+  // logo upload
+  $("f-logo").addEventListener("change", e => {
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    const r = new FileReader();
+    r.onload = ()=>{ state.logoData = r.result; syncForm(); renderPreview(); };
+    r.readAsDataURL(file);
+  });
+
+  // print buttons
+  $("btnPrint").addEventListener("click", requestPrint);
+  $("btnPrintTop").addEventListener("click", requestPrint);
+
+  // gate modal
+  $("gateForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const email = $("gateEmail").value.trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+      $("gateErr").style.display = "block";
+      return;
+    }
+    saveLead(email);
+    try{ sessionStorage.setItem("ig_email_captured","1"); }catch(err){}
+    showGateSuccess(email);
+  });
+  $("gateDonePrint").addEventListener("click", ()=>{ closeGate(); doPrint(); });
+  $("gateSkip").addEventListener("click", ()=>{ closeGate(); doPrint(); });
+  $("gateModal").addEventListener("click", e => { if(e.target === $("gateModal")) closeGate(); });
+
+  // new document
+  $("btnNew").addEventListener("click", newDocument);
+
+  // admin
+  $("adminToggle").addEventListener("click", ()=> $("adminPanel").classList.toggle("open"));
+  $("fsEndpointLabel").textContent = BRAND.formspreeEndpoint || "(not set — leads save in this browser only)";
+  $("btnTestEndpoint").addEventListener("click", testEndpoint);
+  $("btnRetryLeads").addEventListener("click", ()=>{ flushLeadQueue(); });
+  $("btnExportLeads").addEventListener("click", exportLeadsCSV);
+  $("btnClearLeads").addEventListener("click", ()=>{
+    if(confirm("Delete ALL captured leads?")){ lsSet("invoice_leads", []); updateLeadCount(); }
+  });
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
