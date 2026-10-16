@@ -1,0 +1,17 @@
+import {build} from 'esbuild';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {createRequire} from 'node:module';
+import {siteHeader,siteFooter,productBar} from './src/site-chrome.js';
+import {layoutChooserMarkup} from './src/layout-chooser.js';
+const require=createRequire(import.meta.url);
+const result=await build({entryPoints:['src/app.js'],bundle:true,minify:true,write:false,platform:'browser',target:'es2022',format:'iife',loader:{'.png':'dataurl','.svg':'dataurl'},outdir:'review-build',plugins:[{name:'inline-worker',setup(b){b.onResolve({filter:/\?url$/},args=>({path:args.path.slice(0,-4),namespace:'inline-worker'}));b.onLoad({filter:/.*/,namespace:'inline-worker'},async args=>({contents:'export default '+JSON.stringify('data:text/javascript;base64,'+(await readFile(require.resolve(args.path))).toString('base64')),loader:'js'}));}}]});
+const js=result.outputFiles.find(x=>x.path.endsWith('.js')).text.replaceAll('</script','<\\/script');
+const css=result.outputFiles.find(x=>x.path.endsWith('.css')).text;
+await mkdir('review',{recursive:true});
+const logoData='data:image/png;base64,'+(await readFile('src/assets/futureproof-logo.png')).toString('base64');
+const faviconData='data:image/svg+xml;base64,'+(await readFile('src/assets/favicon.svg')).toString('base64');
+const fallback=`<main id="main" tabindex="-1" class="standalone-fallback"><h1>Choose a resume template</h1><p>This file contains the updated layouts. If the buttons do not respond, open the file in Chrome or Edge to use the interactive builder.</p>${layoutChooserMarkup('nr-classic',{})}</main>`;
+const document=`<!doctype html><html lang="en" data-review-start="split-templates"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="theme-color" content="#102b4e"><link rel="icon" type="image/svg+xml" href="${faviconData}"><title>AskFutureProof Resume Studio · VERSION 12</title><style>${css}.review-version-banner{position:fixed;top:0;left:0;right:0;z-index:1000;height:36px;padding:9px 16px;background:#102b4e;color:#ffffff;border-bottom:1px solid #2e74b5;font:700 12px Arial,sans-serif;text-align:center}body{padding-top:36px;--review-banner-height:36px}.standalone-fallback{max-width:1150px;margin:35px auto;padding:20px}.standalone-fallback>p{font-size:13px;line-height:1.8;color:#5e6b7a}</style></head><body><div class="review-version-banner">ASKFUTUREPROOF RESUME STUDIO — VERSION 12</div><div id="app">${siteHeader(logoData)}${productBar()}${fallback}${siteFooter(logoData)}</div><script>${js}</script></body></html>`;
+await writeFile('review/FutureProof-Resume-Studio-Review.html',document);
+await writeFile('review/AskFutureProof-Resume-Studio-v12.html',document);
+console.log('Created standalone browser review. Local builder tools work without a server; account and paid services require deployment.');

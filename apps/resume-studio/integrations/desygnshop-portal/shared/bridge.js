@@ -1,0 +1,5 @@
+import {SignJWT,jwtVerify} from 'jose';
+const key=secret=>{if(typeof secret!=='string'||secret.length<32)throw Error('The account bridge secret must contain at least 32 characters.');return new TextEncoder().encode(secret);};
+export const signBridge=(secret,payload,audience,issuer,seconds=300)=>new SignJWT(payload).setProtectedHeader({alg:'HS256',typ:'JWT'}).setIssuer(issuer).setAudience(audience).setIssuedAt().setExpirationTime(Math.floor(Date.now()/1000)+seconds).sign(key(secret));
+export async function verifyBridge(secret,token,audience,issuer){if(typeof token!=='string'||token.length>12000)throw Error('Invalid bridge message.');return (await jwtVerify(token,key(secret),{algorithms:['HS256'],audience,issuer,requiredClaims:['exp','iat','iss','aud'],maxTokenAge:'10m',clockTolerance:5})).payload;}
+export function serviceOrigin(value){const u=new URL(value);if(u.pathname!=='/'||u.search||u.hash||u.username||u.password||!(u.protocol==='https:'||(u.protocol==='http:'&&['localhost','127.0.0.1'].includes(u.hostname))))throw Error('Use an HTTPS service origin (loopback HTTP is allowed for local testing).');return u.origin;}

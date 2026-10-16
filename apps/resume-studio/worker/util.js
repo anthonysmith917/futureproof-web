@@ -1,0 +1,11 @@
+export const json=(value,status=200,headers={})=>Response.json(value,{status,headers:{'Cache-Control':'no-store',...headers}});
+export class HttpError extends Error{constructor(message,status=400){super(message);this.status=status;}}
+export const requireEnv=(env,...keys)=>{if(keys.some(k=>!env[k]))throw new HttpError('This service has not been configured yet.',503);};
+export const now=()=>Math.floor(Date.now()/1000);
+export const random=()=>crypto.randomUUID().replaceAll('-','')+crypto.randomUUID().replaceAll('-','');
+export const hash=async value=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)))).map(x=>x.toString(16).padStart(2,'0')).join('');
+export const cookie=(request,name)=>request.headers.get('Cookie')?.split(';').map(v=>v.trim()).find(v=>v.startsWith(name+'='))?.slice(name.length+1)||'';
+export const sessionCookie=(name,value,age,env)=>`${name}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${age}${new URL(env.APP_URL).protocol==='https:'?'; Secure':''}`;
+export async function body(request,max=100000){const reader=request.body?.getReader();if(!reader)throw new HttpError('Request body is required.');let size=0;const chunks=[];while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>max){await reader.cancel();throw new HttpError('Request is too large.',413);}chunks.push(value);}const bytes=new Uint8Array(size);let p=0;for(const c of chunks){bytes.set(c,p);p+=c.length;}try{return JSON.parse(new TextDecoder().decode(bytes));}catch{throw new HttpError('Invalid JSON.');}}
+export function sameOrigin(request,env){const origin=request.headers.get('Origin');if(origin!==new URL(env.APP_URL).origin)throw new HttpError('Request origin is not allowed.',403);}
+export async function limit(env,key,max,seconds=60){const k=await hash(key);const row=await env.DB.prepare('INSERT INTO rate_limits(key,count,expires) VALUES (?,1,?) ON CONFLICT(key) DO UPDATE SET count=CASE WHEN expires<? THEN 1 ELSE count+1 END, expires=CASE WHEN expires<? THEN excluded.expires ELSE expires END RETURNING count').bind(k,now()+seconds,now(),now()).first();if(row.count>max)throw new HttpError('Please wait before trying again.',429);}
