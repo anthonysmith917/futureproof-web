@@ -39,7 +39,8 @@ body{
 .page-title h1{font-size:1.6rem;color:#102b4e;letter-spacing:-.02em;margin:0 0 4px}
 .page-title h1 span{color:#2e74b5}
 .page-title p{color:#5e6b7a;font-size:.95rem;margin:0}
-@media(max-width:760px){.site-nav a:not(.nav-cta){display:none}.brand img{height:38px}}
+@media(max-width:1200px){.nav-wrap{flex-wrap:wrap;padding-block:12px}.site-nav{flex-wrap:wrap}}
+@media(max-width:760px){.site-nav a:not(.nav-cta):not(.resume-studio-link){display:none}.brand img{height:38px}}
 /* ============ LAYOUT ============ */
 .app{max-width:1200px;margin:0 auto;padding:16px;display:grid;gap:20px;grid-template-columns:1fr}
 @media(min-width:980px){
@@ -168,7 +169,7 @@ table.inv-items td.qty,table.inv-items td.rate{text-align:right;white-space:nowr
   <div class="nav-wrap">
     <a class="brand" href="index.html" aria-label="FutureProof home"><img id="brandLogo" alt="FutureProof"></a>
     <nav class="site-nav" aria-label="Primary navigation">
-      <a href="index.html">Home</a><a href="products.html">Products</a><a href="services.html">Services</a><a href="about.html">About</a><a href="insights.html">Insights</a><a href="invoice-generator.html" aria-current="page">Invoice Generator</a><a class="nav-cta" href="contact.html">Contact us</a>
+      <a href="index.html">Home</a><a href="products.html">Products</a><a href="services.html">Services</a><a href="about.html">About</a><a href="insights.html">Insights</a><a href="invoice-generator.html" aria-current="page">Invoice Generator</a><a class="resume-studio-link" href="https://resume.askfutureproof.com/">Resume Studio</a><a class="nav-cta" href="contact.html">Contact us</a>
     </nav>
   </div>
 </header>
@@ -378,7 +379,7 @@ table.inv-items td.qty,table.inv-items td.rate{text-align:right;white-space:nowr
         <p>AI software and automation tools that help people and organizations make smarter decisions with their data.</p>
       </div>
       <div class="footer-col">
-        <h3>Products</h3>
+        <h3>Products</h3><a href="https://resume.askfutureproof.com/">Resume Studio</a>
         <a href="products.html#siftiq">SiftIQ</a>
         <a href="products.html#siftiq-money">SiftIQ Money</a>
         <a href="products.html#calculator-buddy">Calculator Buddy</a>
