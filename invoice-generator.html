@@ -162,6 +162,7 @@ table.inv-items td.qty,table.inv-items td.rate{text-align:right;white-space:nowr
   @page{margin:14mm}
 }
 </style>
+<link rel="stylesheet" href="assets/tools.css?v=20261022">
 </head>
 <body>
 
@@ -169,7 +170,7 @@ table.inv-items td.qty,table.inv-items td.rate{text-align:right;white-space:nowr
   <div class="nav-wrap">
     <a class="brand" href="index.html" aria-label="FutureProof home"><img id="brandLogo" alt="FutureProof"></a>
     <nav class="site-nav" aria-label="Primary navigation">
-      <a href="index.html">Home</a><a href="products.html">Products</a><a href="services.html">Services</a><a href="about.html">About</a><a href="insights.html">Insights</a><a href="invoice-generator.html" aria-current="page">Invoice Generator</a><a class="resume-studio-link" href="https://resume.askfutureproof.com/">Resume Studio</a><a class="nav-cta" href="contact.html">Contact us</a>
+      <a href="index.html">Home</a><a href="products.html">Products</a><a href="services.html">Services</a><a href="about.html">About</a><a href="insights.html">Insights</a><details class="nav-tools"><summary>Tools</summary><div class="tools-menu"><a href="invoice-generator.html">Invoice Generator<small>Create invoices and quotes</small></a><a href="https://resume.askfutureproof.com/">Resume Studio<small>Build your next career move</small></a><a href="https://reportstudio.askfutureproof.com/">Report Studio<small>Turn your data into a report</small></a><a class="tools-all" href="tools.html">Explore all tools →</a></div></details><a class="nav-cta" href="contact.html">Contact us</a>
     </nav>
   </div>
 </header>
@@ -379,7 +380,7 @@ table.inv-items td.qty,table.inv-items td.rate{text-align:right;white-space:nowr
         <p>AI software and automation tools that help people and organizations make smarter decisions with their data.</p>
       </div>
       <div class="footer-col">
-        <h3>Products</h3><a href="https://resume.askfutureproof.com/">Resume Studio</a>
+        <h3>Products</h3><a href="tools.html">All tools</a><a href="https://reportstudio.askfutureproof.com/">Report Studio</a><a href="https://resume.askfutureproof.com/">Resume Studio</a>
         <a href="products.html#siftiq">SiftIQ</a>
         <a href="products.html#siftiq-money">SiftIQ Money</a>
         <a href="products.html#calculator-buddy">Calculator Buddy</a>
@@ -946,5 +947,6 @@ function init(){
 
 document.addEventListener("DOMContentLoaded", init);
 </script>
+<script src="assets/tools.js?v=20261022" defer></script>
 </body>
 </html>
