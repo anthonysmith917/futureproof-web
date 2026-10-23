@@ -1,3 +1,4 @@
+document.querySelectorAll('.tools-menu').forEach(menu=>{if(!menu.querySelector('a[href="https://pdf.askfutureproof.com/"]')){const link=document.createElement('a');link.href='https://pdf.askfutureproof.com/';link.innerHTML='PDF Studio<small>Edit existing PDFs with AI</small>';menu.insertBefore(link,menu.querySelector('.tools-all'));}});
 // Native details keeps the tools accessible even when scripts are unavailable.
 document.querySelectorAll('.nav-tools').forEach((menu) => {
   const close = () => { menu.open = false; };
